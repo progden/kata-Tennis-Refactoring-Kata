@@ -1,76 +1,92 @@
+import lombok.Getter;
 
 public class TennisGame1 implements TennisGame {
-    
-    private int m_score1 = 0;
-    private int m_score2 = 0;
-    private String player1Name;
-    private String player2Name;
+    private final Player player1;
+    private final Player player2;
 
     public TennisGame1(String player1Name, String player2Name) {
-        this.player1Name = player1Name;
-        this.player2Name = player2Name;
+        player1 = new Player(player1Name);
+        player2 = new Player(player2Name);
     }
 
     public void wonPoint(String playerName) {
-        if (playerName == "player1")
-            m_score1 += 1;
+        if (player1.getName().equals(playerName))
+            player1.wonPoint();
         else
-            m_score2 += 1;
+            player2.wonPoint();
     }
 
     public String getScore() {
-        String score = "";
-        int tempScore=0;
-        if (m_score1==m_score2)
-        {
-            switch (m_score1)
-            {
-                case 0:
-                        score = "Love-All";
-                    break;
-                case 1:
-                        score = "Fifteen-All";
-                    break;
-                case 2:
-                        score = "Thirty-All";
-                    break;
-                default:
-                        score = "Deuce";
-                    break;
-                
-            }
-        }
-        else if (m_score1>=4 || m_score2>=4)
-        {
-            int minusResult = m_score1-m_score2;
-            if (minusResult==1) score ="Advantage player1";
-            else if (minusResult ==-1) score ="Advantage player2";
-            else if (minusResult>=2) score = "Win for player1";
-            else score ="Win for player2";
-        }
-        else
-        {
-            for (int i=1; i<3; i++)
-            {
-                if (i==1) tempScore = m_score1;
-                else { score+="-"; tempScore = m_score2;}
-                switch(tempScore)
-                {
-                    case 0:
-                        score+="Love";
-                        break;
-                    case 1:
-                        score+="Fifteen";
-                        break;
-                    case 2:
-                        score+="Thirty";
-                        break;
-                    case 3:
-                        score+="Forty";
-                        break;
-                }
-            }
-        }
-        return score;
+        return isDraw() ? player1.drawScoreString()
+                : isAdv() ? getWinningPlayer().advScoreString()
+                : isWin() ? getWinningPlayer().winScoreString()
+                : normalScoreString();
+
     }
+
+    private boolean isDraw() {
+        return player1.compareTo(player2) == 0;
+    }
+
+    private boolean isAdv() {
+        return (player1.getScore() >= 4 || player2.getScore() >= 4) && Math.abs(player1.getScore() - player2.getScore()) == 1;
+    }
+
+    private boolean isWin() {
+        return (player1.getScore() >= 4 || player2.getScore() >= 4) && Math.abs(player1.getScore() - player2.getScore()) >= 2;
+    }
+
+    private Player getWinningPlayer() {
+        return player1.compareTo(player2) > 0 ? player1 : player2;
+    }
+
+    public String normalScoreString() {
+        return player1.scoreString() + "-" + player2.scoreString();
+    }
+
+    @Getter
+    public class Player implements Comparable<Player> {
+        private final String name;
+        private int score;
+
+        public Player(String playerName) {
+            this.name = playerName;
+            this.score = 0;
+        }
+
+        public void wonPoint() {
+            score++;
+        }
+
+        public String scoreString() {
+            return switch (getScore()) {
+                case 0 -> "Love";
+                case 1 -> "Fifteen";
+                case 2 -> "Thirty";
+                case 3 -> "Forty";
+                default -> "";
+            };
+        }
+
+        public String drawScoreString() {
+            return switch (getScore()) {
+                case 0, 1, 2 -> scoreString() + "-All";
+                default -> "Deuce";
+            };
+        }
+
+        public String advScoreString() {
+            return "Advantage " + getName();
+        }
+
+        public String winScoreString() {
+            return "Win for " + getName();
+        }
+
+        @Override
+        public int compareTo(Player o) {
+            return Integer.compare(score, o.score);
+        }
+    }
+
 }
