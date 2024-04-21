@@ -45,7 +45,7 @@ public class TennisGame1 implements TennisGame {
     }
 
     @Getter
-    public class Player implements Comparable<Player> {
+    public static class Player implements Comparable<Player> {
         private final String name;
         private int score;
 
