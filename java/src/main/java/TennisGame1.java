@@ -29,18 +29,20 @@ public class TennisGame1 implements TennisGame {
     }
 
     private boolean isAdv() {
-        return (player1.getScore() >= 4 || player2.getScore() >= 4) && Math.abs(player1.getScore() - player2.getScore()) == 1;
+        return (player1.getScore() >= 4 || player2.getScore() >= 4)
+                && Math.abs(player1.getScore() - player2.getScore()) == 1;
     }
 
     private boolean isWin() {
-        return (player1.getScore() >= 4 || player2.getScore() >= 4) && Math.abs(player1.getScore() - player2.getScore()) >= 2;
+        return (player1.getScore() >= 4 || player2.getScore() >= 4)
+                && Math.abs(player1.getScore() - player2.getScore()) >= 2;
     }
 
     private Player getWinningPlayer() {
         return player1.compareTo(player2) > 0 ? player1 : player2;
     }
 
-    public String normalScoreString() {
+    private String normalScoreString() {
         return player1.scoreString() + "-" + player2.scoreString();
     }
 
