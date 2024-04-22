@@ -12,8 +12,10 @@ public class TennisGame1 implements TennisGame {
     public void wonPoint(String playerName) {
         if (player1.getName().equals(playerName))
             player1.wonPoint();
-        else
+        else if (player2.getName().equals(playerName))
             player2.wonPoint();
+
+        // TODO: throw exception if player name is not valid
     }
 
     public String getScore() {
@@ -48,13 +50,25 @@ public class TennisGame1 implements TennisGame {
     }
 
     private boolean isAdv() {
-        return (player1.getScore() >= 4 || player2.getScore() >= 4)
-                && Math.abs(player1.getScore() - player2.getScore()) == 1;
+        return bothPlayerScoreGreateThenFour()
+                && scoreGapEqTo(1);
     }
 
     private boolean isWin() {
-        return (player1.getScore() >= 4 || player2.getScore() >= 4)
-                && Math.abs(player1.getScore() - player2.getScore()) >= 2;
+        return bothPlayerScoreGreateThenFour()
+                && scoreGapGeTo(2);
+    }
+
+    private boolean bothPlayerScoreGreateThenFour() {
+        return player1.getScore() >= 4 || player2.getScore() >= 4;
+    }
+
+    private boolean scoreGapEqTo(int i) {
+        return Math.abs(player1.getScore() - player2.getScore()) == i;
+    }
+
+    private boolean scoreGapGeTo(int i) {
+        return Math.abs(player1.getScore() - player2.getScore()) >= i;
     }
 
     private Player getWinningPlayer() {
