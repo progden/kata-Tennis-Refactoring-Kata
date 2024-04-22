@@ -17,11 +17,30 @@ public class TennisGame1 implements TennisGame {
     }
 
     public String getScore() {
-        return isDraw() ? player1.drawScoreString()
-                : isAdv() ? getWinningPlayer().advScoreString()
-                : isWin() ? getWinningPlayer().winScoreString()
-                : normalScoreString();
+        return isDraw() ? drawScore(player1) // or player2, since they are equal
+                : isAdv() ? advScore(getWinningPlayer())
+                : isWin() ? winScore(getWinningPlayer())
+                : normalScore(player1, player2);
 
+    }
+
+    private String winScore(Player winningPlayer) {
+        return "Win for " + winningPlayer.getName();
+    }
+
+    private String advScore(Player winningPlayer) {
+        return "Advantage " + winningPlayer.getName();
+    }
+
+    private String drawScore(Player anyPlayer) {
+        return switch (anyPlayer.getScore()) {
+            case 0, 1, 2 -> anyPlayer.scoreString() + "-All";
+            default -> "Deuce";
+        };
+    }
+
+    private String normalScore(Player p1, Player p2) {
+        return p1.scoreString() + "-" + p2.scoreString();
     }
 
     private boolean isDraw() {
@@ -40,10 +59,6 @@ public class TennisGame1 implements TennisGame {
 
     private Player getWinningPlayer() {
         return player1.compareTo(player2) > 0 ? player1 : player2;
-    }
-
-    private String normalScoreString() {
-        return player1.scoreString() + "-" + player2.scoreString();
     }
 
     @Getter
@@ -68,21 +83,6 @@ public class TennisGame1 implements TennisGame {
                 case 3 -> "Forty";
                 default -> "";
             };
-        }
-
-        public String drawScoreString() {
-            return switch (getScore()) {
-                case 0, 1, 2 -> scoreString() + "-All";
-                default -> "Deuce";
-            };
-        }
-
-        public String advScoreString() {
-            return "Advantage " + getName();
-        }
-
-        public String winScoreString() {
-            return "Win for " + getName();
         }
 
         @Override
