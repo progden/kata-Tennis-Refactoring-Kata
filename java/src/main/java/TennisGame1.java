@@ -1,76 +1,93 @@
 
 public class TennisGame1 implements TennisGame {
-    
-    private int m_score1 = 0;
-    private int m_score2 = 0;
-    private String player1Name;
-    private String player2Name;
+    private final Player p1;
+    private final Player p2;
 
     public TennisGame1(String player1Name, String player2Name) {
-        this.player1Name = player1Name;
-        this.player2Name = player2Name;
+        p1 = new Player(player1Name);
+        p2 = new Player(player2Name);
     }
 
     public void wonPoint(String playerName) {
-        if (playerName == "player1")
-            m_score1 += 1;
+        if (playerName == p1.name)
+            p1.wonPoint();
         else
-            m_score2 += 1;
+            p2.wonPoint();
     }
 
     public String getScore() {
-        String score = "";
-        int tempScore=0;
-        if (m_score1==m_score2)
-        {
-            switch (m_score1)
-            {
-                case 0:
-                        score = "Love-All";
-                    break;
-                case 1:
-                        score = "Fifteen-All";
-                    break;
-                case 2:
-                        score = "Thirty-All";
-                    break;
-                default:
-                        score = "Deuce";
-                    break;
-                
-            }
+        return isDraw() ? drawScore()
+                : isAdv() ? advScore(getWinningPlayer())
+                : isWin() ? winScore(getWinningPlayer())
+                : normalScore();
+    }
+
+    // 顯示分數結果相關的 API
+    private String winScore(Player winningPlayer) {
+        return "Win for " + winningPlayer.name;
+    }
+
+    private String advScore(Player winningPlayer) {
+        return "Advantage " + winningPlayer.name;
+    }
+
+    private String drawScore() {
+        // p1 or p2 is fine, since they are the same
+        return switch (p1.score) {
+            case 0, 1, 2 -> p1.scoreString() + "-All";
+            default -> "Deuce";
+        };
+    }
+
+    private String normalScore() {
+        return p1.scoreString() + "-" + p2.scoreString();
+    }
+
+    // 判斷遊戲結果相關的 API
+    private boolean isWin() {
+        return isAdvOrWin() && scoreGap() >= 2;
+    }
+
+    private boolean isAdv() {
+        return isAdvOrWin() && scoreGap() == 1;
+    }
+
+    private boolean isDraw() {
+        return p1.score == p2.score;
+    }
+
+    private boolean isAdvOrWin() {
+        return p1.score >= 4 || p2.score >= 4;
+    }
+
+    private int scoreGap() {
+        return Math.abs(p1.score - p2.score);
+    }
+
+    private Player getWinningPlayer() {
+        return p1.score - p2.score > 0 ? p1 : p2;
+    }
+
+    public static class Player {
+        private final String name;
+        private int score = 0;
+
+        public Player(String playerName) {
+            this.name = playerName;
         }
-        else if (m_score1>=4 || m_score2>=4)
-        {
-            int minusResult = m_score1-m_score2;
-            if (minusResult==1) score ="Advantage player1";
-            else if (minusResult ==-1) score ="Advantage player2";
-            else if (minusResult>=2) score = "Win for player1";
-            else score ="Win for player2";
+
+        private void wonPoint() {
+            score = score + 1;
         }
-        else
-        {
-            for (int i=1; i<3; i++)
-            {
-                if (i==1) tempScore = m_score1;
-                else { score+="-"; tempScore = m_score2;}
-                switch(tempScore)
-                {
-                    case 0:
-                        score+="Love";
-                        break;
-                    case 1:
-                        score+="Fifteen";
-                        break;
-                    case 2:
-                        score+="Thirty";
-                        break;
-                    case 3:
-                        score+="Forty";
-                        break;
-                }
-            }
+
+        private String scoreString() {
+            return switch (score) {
+                case 0 -> "Love";
+                case 1 -> "Fifteen";
+                case 2 -> "Thirty";
+                case 3 -> "Forty";
+                default -> throw new IllegalStateException("Unexpected value: " + score);
+            };
         }
-        return score;
     }
 }
